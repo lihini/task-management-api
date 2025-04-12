@@ -76,7 +76,7 @@ describe('Tasks Controller', () => {
     mockTasksService.prototype.getAllTasks.mockResolvedValue(tasks);
 
     const response = await request(app).get('/tasks').expect(200);
-    expect(response.body).toEqual(tasks);
+    expect(response.body).toEqual({ tasks });
   });
 
   it('GET /tasks/:id fetches task', async () => {

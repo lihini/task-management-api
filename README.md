@@ -1,6 +1,23 @@
 # Task Management API
 
-A RESTful API for managing tasks using Node.js, TypeScript, and AWS (DynamoDB, S3).
+A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and AWS services (DynamoDB and S3).
+
+## Features
+- Create, read, update, and delete tasks.
+- Task fields: `id`, `title`, `description`, `status`, `createdAt`, `updatedAt`.
+- Input validation and error handling.
+- Integration with AWS DynamoDB for task storage.
+- Integration with AWS S3 for file attachments.
+- Comprehensive unit and integration tests.
+- Logging with Winston.
+
+## Prerequisites
+- Node.js v22 LTS
+- AWS account with DynamoDB and S3 access
+- TypeScript
+- Git
+- AWS CLI (for provisioning)
+- AWS CDK (optional, for CDK-based provisioning)
 
 ## Setup
 
@@ -10,36 +27,82 @@ A RESTful API for managing tasks using Node.js, TypeScript, and AWS (DynamoDB, S
    cd task-management-api
    ```
 
-2. Install dependencies:
+2. **Install dependencies**:
     ```bash
     npm install
     ```
 
-3. Configure environment variables: Copy .env.example to .env and fill in your AWS credentials and configurations.
+3. **Provision DynamoDB Table**:
 
-4. Build the project:
+    Create a DynamoDB table named `tasks` with a partition key `id` (string).
+
+    Option 1: AWS CLI:
+
+    ```bash
+    aws dynamodb create-table \
+        --table-name tasks \
+        --attribute-definitions AttributeName=id,AttributeType=S \
+        --key-schema AttributeName=id,KeyType=HASH \
+        --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+        --region us-east-1
+    ```
+
+    Option 2: AWS CDK: Initialize a CDK project.
+    ```bash
+    cdk init app --language typescript
+    npm install @aws-cdk/aws-dynamodb
+    ```
+
+    Deploy:
+    ```bash
+    cdk bootstrap
+    cdk deploy
+    ```
+
+4. **Configure environment variables**: 
+
+    Copy `.env.sample` to `.env` and fill in your AWS credentials and configurations.
+
+5. Build the project:
     ```bash
     npm run build
     ```
 
-5. Run the application:
+6. Run the application:
     ```bash
     npm start
     ```
 
-6. Run in development mode:
+7. Run in development mode:
     ```bash
     npm run dev
     ```
 
-7. Run tests:
+8. Run tests:
     ```bash
     npm run test
     ```
 
-## Endpoints
+## API Endpoints
 - POST /tasks: Create a task
 - GET /tasks: Get all tasks
 - GET /tasks/:id: Get a task by ID
 - PUT /tasks/:id: Update a task
 - DELETE /tasks/:id: Delete a task
+
+## Project Structure
+
+- `src/config/`: Environment variable configuration
+- `src/controllers/`: Request handling logic
+- `src/middlewares/`: Custom middleware for validation and error handling
+- `src/models/`: Data models
+- `src/repositories/`: Data access logic
+- `src/routes/`: API route definitions
+- `src/services/`: Business logic
+- `src/utils/`: Utility functions
+- `tests`: Unit and integration tests
+
+## DynamoDB Setup
+- Table Name: task-mgmt-api-tasks
+- Partition Key: id (string)
+- Provisioned Throughput: 5 read/write capacity units (adjust as needed)

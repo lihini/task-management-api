@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { TasksService } from '../services/tasks.service';
 
+/**
+ * Controllers for /tasks API endpoints
+ */
 export class TasksController {
   private tasksService: TasksService;
 
@@ -19,7 +22,9 @@ export class TasksController {
 
   async getAllTasks(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const tasks = await this.tasksService.getAllTasks();
+      const tasks = {
+        tasks: await this.tasksService.getAllTasks(),
+      };
       res.status(200).json(tasks);
     } catch (error) {
       next(error);
