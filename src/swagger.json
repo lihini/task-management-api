@@ -1,0 +1,461 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "title": "Task Management API",
+      "description": "A RESTful API for managing tasks with AWS DynamoDB and S3 integration.",
+      "version": "1.0.0",
+      "contact": {
+        "name": "API Support",
+        "email": "support@example.com"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Local development server"
+      }
+    ],
+    "paths": {
+      "/tasks": {
+        "post": {
+          "summary": "Create a new task",
+          "description": "Creates a new task with the provided details and stores it in DynamoDB.",
+          "tags": ["Tasks"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateTaskRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Task created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Task"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request data",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "get": {
+          "summary": "Get all tasks",
+          "description": "Retrieves a list of all tasks from DynamoDB.",
+          "tags": ["Tasks"],
+          "responses": {
+            "200": {
+              "description": "List of tasks",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Task"
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/tasks/{id}": {
+        "get": {
+          "summary": "Get a task by ID",
+          "description": "Retrieves a specific task by its UUID from DynamoDB.",
+          "tags": ["Tasks"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "UUID of the task",
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Task retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Task"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid task ID",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Update a task",
+          "description": "Updates an existing task by its UUID in DynamoDB.",
+          "tags": ["Tasks"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "UUID of the task",
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateTaskRequest"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Task updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Task"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request data or task ID",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete a task",
+          "description": "Deletes a task by its UUID from DynamoDB.",
+          "tags": ["Tasks"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "UUID of the task",
+              "schema": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Task deleted successfully"
+            },
+            "404": {
+              "description": "Task not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid task ID",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/GenericErrorResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Task": {
+          "type": "object",
+          "required": ["id", "title", "description", "status", "createdAt", "updatedAt"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier for the task"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the task"
+            },
+            "description": {
+              "type": "string",
+              "description": "Detailed description of the task"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "in-progress", "completed"],
+              "description": "Current status of the task"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp when the task was created"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp when the task was last updated"
+            }
+          },
+          "example": {
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "title": "Complete project proposal",
+            "description": "Draft and finalize the project proposal for client review.",
+            "status": "pending",
+            "createdAt": "2025-04-12T10:00:00Z",
+            "updatedAt": "2025-04-12T10:00:00Z"
+          }
+        },
+        "CreateTaskRequest": {
+          "type": "object",
+          "required": ["title", "description"],
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Title of the task"
+            },
+            "description": {
+              "type": "string",
+              "description": "Detailed description of the task"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "in-progress", "completed"],
+              "description": "Initial status of the task (defaults to 'pending' if not provided)"
+            }
+          },
+          "example": {
+            "title": "Complete project proposal",
+            "description": "Draft and finalize the project proposal for client review.",
+            "status": "pending"
+          }
+        },
+        "UpdateTaskRequest": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "Updated title of the task"
+            },
+            "description": {
+              "type": "string",
+              "description": "Updated description of the task"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "in-progress", "completed"],
+              "description": "Updated status of the task"
+            }
+          },
+          "example": {
+            "title": "Revised project proposal",
+            "description": "Incorporate feedback and finalize the proposal.",
+            "status": "in-progress"
+          }
+        },
+        "ValidationErrorResponse": {
+          "type": "object",
+          "properties": {
+            "status": {
+                "type": "number",
+                "description": "HTTP status code"
+            },
+            "message": {
+              "type": "string",
+              "description": "Error message describing the issue"
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "msg": {
+                    "type": "string",
+                    "description": "Validation error message"
+                  },
+                  "param": {
+                    "type": "string",
+                    "description": "Field that caused the error"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Location of the field (e.g., body, query)"
+                  }
+                }
+              },
+              "description": "Detailed validation errors (if applicable)"
+            }
+          },
+          "example": {
+            "message": "Invalid request data",
+            "errors": [
+              {
+                "msg": "Title is required",
+                "param": "title",
+                "location": "body"
+              }
+            ]
+          }
+        },
+        "GenericErrorResponse": {
+          "type": "object",
+          "properties": {
+            "status": {
+                "type": "number",
+                "description": "HTTP status code"
+            },
+            "error": {
+              "type": "object",
+              "properties": {
+                "message": {
+                    "type": "string",
+                    "description": "Error message describing the issue"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "Error instance type"
+                },
+                "code": {
+                    "type": "number",
+                    "description": "Application specific error code"
+                }
+              },
+              "description": "Detailed error messages (if applicable)"
+            }
+          },
+          "example": {
+            "message": "Invalid request data",
+            "errors": [
+              {
+                "msg": "Title is required",
+                "param": "title",
+                "location": "body"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "tags": [
+      {
+        "name": "Tasks",
+        "description": "Operations related to task management"
+      }
+    ]
+  }
