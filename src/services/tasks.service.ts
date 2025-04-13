@@ -43,6 +43,7 @@ export class TasksService {
    * Fetch a task by its ID.
    * @param id task uuid
    * @returns task instance
+   * @throws NotFoundError if task doesn't exist
    */
   async getTaskById(id: string): Promise<Task> {
     const task = await this.repo.readTaskById(id);
@@ -56,7 +57,8 @@ export class TasksService {
    * Updates a given task. This will replace the existing task.
    * @param id task uuid
    * @param data properties of the updated task
-   * @returns null if a task doesn't exist for the given id or the updated task
+   * @returns the updated task
+   * @throws NotFoundError if task doesn't exist
    */
   async updateTask(
     id: string,

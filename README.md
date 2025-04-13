@@ -106,3 +106,8 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 - Table Name: task-mgmt-api-tasks
 - Partition Key: id (string)
 - Provisioned Throughput: 5 read/write capacity units (adjust as needed)
+
+## Future Enhancements
+- Dependency injection
+- Rate limiting
+- Pagination for GET endpoints
