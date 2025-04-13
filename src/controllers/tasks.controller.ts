@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { TasksService } from '../services/tasks.service';
+import { CreateTaskDTO, UpdateTaskDTO } from '../dtos/task.dto';
 
 /**
  * Controllers for /tasks API endpoints
@@ -13,8 +14,12 @@ export class TasksController {
 
   async createTask(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const task = await this.tasksService.createTask(req.body);
-      res.status(201).json(task);
+      const models = await this.tasksService.createTask(req.body);
+      const resource: CreateTaskDTO = {
+        ...models.task,
+        uploadUrls: models.uploadUrls,
+      };
+      res.status(201).json(resource);
     } catch (error) {
       next(error);
     }
@@ -42,8 +47,12 @@ export class TasksController {
 
   async updateTask(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const task = await this.tasksService.updateTask(req.params.id, req.body);
-      res.status(200).json(task);
+      const models = await this.tasksService.updateTask(req.params.id, req.body);
+      const resource: UpdateTaskDTO = {
+        ...models.task,
+        uploadUrls: models.uploadUrls,
+      };
+      res.status(200).json(resource);
     } catch (error) {
       next(error);
     }

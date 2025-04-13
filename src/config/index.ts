@@ -11,7 +11,7 @@ export const config = {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     },
     region: process.env.AWS_REGION || 'us-east-1',
-    s3Bucket: process.env.S3_BUCKET_NAME,
+    s3Bucket: process.env.S3_BUCKET_NAME || 'task-mgmt-api-attachments',
     tables: {
       tasks: process.env.DYNAMODB_TASKS_TABLE_NAME,
     },

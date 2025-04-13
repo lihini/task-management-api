@@ -1,13 +1,17 @@
+import { DynamoDBService } from '../services/dynamodb.service';
+import { S3Service } from '../services/s3.service';
 import { config } from '../config';
 import { Task } from '../models/task.model';
-import { DynamoDBService } from '../services/dynamodb.service';
 
 /**
  * Data access layer for tasks. Integrates with DynamoDB to persist tasks.
+ * Dynamodb table partition key: id (string).
  */
 export class TasksRepository {
   private db = new DynamoDBService();
-    
+
+  private s3 = new S3Service();
+
   private tableName = config.aws.tables.tasks || 'tasks';  // load db table name from configuration
 
   /**
@@ -37,7 +41,7 @@ export class TasksRepository {
   }
 
   /**
-   * Update title, description or status of a task
+   * Update title, description, status and file names of a task
    * @param task model
    * @returns 
    */
@@ -45,7 +49,7 @@ export class TasksRepository {
     return this.db.updateItem<Task>(
       this.tableName,
       { id: task.id },
-      'set title = :title, description = :desc, #stat = :stat, updatedAt = :updatedAt',
+      'SET title = :title, description = :desc, #stat = :stat, updatedAt = :updatedAt, fileUrls = :fileUrls',
       {
         '#stat': 'status',
       },
@@ -54,6 +58,7 @@ export class TasksRepository {
         ':desc': task.description,
         ':stat': task.status,
         ':updatedAt': task.updatedAt,
+        ':fileUrls': task.fileUrls || [],
       },
     );
   }
@@ -62,7 +67,7 @@ export class TasksRepository {
    * Permanently delete a task
    * @param id task id
    */
-  async deleteTask(id: string) {
-    await this.db.deleteItem(this.tableName, { id });
+  async deleteTask(id: string): Promise<boolean> {
+    return this.db.deleteItem(this.tableName, { id });
   }
 }

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { NotFoundError } from '../utils/errors.util';
+import { DynamoDBError, NotFoundError, S3Error } from '../utils/errors.util';
 import { GenericErrorResponse } from '../dtos/error-response.dto';
 import { logger } from '../utils/logger.util';
 
@@ -22,6 +22,23 @@ export const errorHandler = (
       },
     });
   }
+
+  if (err instanceof DynamoDBError) {
+    // indicate issue is related to DynamoDB
+    res.status(500).json({
+      message: `DynamoDB error: ${err.message}`,
+    });
+    return;
+  }
+
+  if (err instanceof S3Error) {
+    // indicate issue is related to S3
+    res.status(500).json({
+      message: `S3 error: ${err.message}`,
+    });
+    return;
+  }
+
 
   // return all other errors with 500 status code
   res.status(500).json(<GenericErrorResponse>{

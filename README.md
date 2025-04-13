@@ -36,7 +36,7 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 
     Create a DynamoDB table named `tasks` with a partition key `id` (string).
 
-    Option 1: AWS CLI:
+    AWS CLI:
 
     ```bash
     aws dynamodb create-table \
@@ -47,38 +47,56 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
         --region us-east-1
     ```
 
-    Option 2: AWS CDK: Initialize a CDK project.
+4. **Provision S3 bucket**:
+
+    Create an S3 bucket named `task-attachments`.
     ```bash
-    cdk init app --language typescript
-    npm install @aws-cdk/aws-dynamodb
+    aws s3api create-bucket \
+        --bucket task-attachments \
+        --region us-east-1
     ```
 
-    Deploy:
-    ```bash
-    cdk bootstrap
-    cdk deploy
+    Configure CORS for client-side uploads (save as cors.json):
+    ```json
+    {
+        "CORSRules": [
+            {
+            "AllowedHeaders": ["*"],
+            "AllowedMethods": ["PUT"],
+            "AllowedOrigins": ["*"],
+            "MaxAgeSeconds": 3000
+            }
+        ]
+    }
     ```
 
-4. **Configure environment variables**: 
+    Apply CORS:
+    ```bash
+    aws s3api put-bucket-cors \
+        --bucket task-attachments \
+        --cors-configuration file://cors.json
+    ```
+
+5. **Configure environment variables**: 
 
     Copy `.env.sample` to `.env` and fill in your AWS credentials and configurations.
 
-5. Build the project:
+6. Build the project:
     ```bash
     npm run build
     ```
 
-6. Run the application:
+7. Run the application:
     ```bash
     npm start
     ```
 
-7. Run in development mode:
+8. Run in development mode:
     ```bash
     npm run dev
     ```
 
-8. Run tests:
+9. Run tests:
     ```bash
     npm run test
     ```
@@ -89,6 +107,12 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 - GET /tasks/:id: Get a task by ID
 - PUT /tasks/:id: Update a task
 - DELETE /tasks/:id: Delete a task
+
+## File Upload Workflow
+1. Send fileNames in POST /tasks or PUT /tasks/:id.
+2. Receive pre-signed uploadUrls in the response.
+3. Use the URLs to upload files directly to S3 via client-side PUT requests.
+4. Permanent file URLs are stored in the task's fileUrls field.
 
 ## Project Structure
 
@@ -102,10 +126,11 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 - `src/utils/`: Utility functions
 - `tests`: Unit and integration tests
 
-## DynamoDB Setup
-- Table Name: task-mgmt-api-tasks
-- Partition Key: id (string)
-- Provisioned Throughput: 5 read/write capacity units (adjust as needed)
+## AWS Setup
+- DynamoDB Table: tasks, partition key id (string).
+    - Provisioned Throughput: 5 read/write capacity units (adjust as needed)
+- S3 Bucket: task-attachments, with CORS enabled for uploads.
+- IAM Permissions: Ensure s3:PutObject, s3:DeleteObject, and DynamoDB CRUD permissions.
 
 ## Future Enhancements
 - Dependency injection

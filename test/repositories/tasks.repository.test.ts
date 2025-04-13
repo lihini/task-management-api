@@ -134,13 +134,14 @@ describe('TasksRepository', () => {
       expect(mockDynamoDBService.prototype.updateItem).toHaveBeenCalledWith(
         'test-tasks',
         { id: 'uuid-123' },
-        'set title = :title, description = :desc, #stat = :stat, updatedAt = :updatedAt',
+        'SET title = :title, description = :desc, #stat = :stat, updatedAt = :updatedAt, fileUrls = :fileUrls',
         { '#stat': 'status' },
         {
           ':title': task.title,
           ':desc': task.description,
           ':stat': task.status,
           ':updatedAt': task.updatedAt,
+          ':fileUrls': [],
         },
       );
       expect(result).toEqual(updatedTask);
@@ -177,7 +178,7 @@ describe('TasksRepository', () => {
     it('should not throw if task does not exist', async () => {
       mockDynamoDBService.prototype.deleteItem.mockResolvedValue(false);
 
-      await expect(repository.deleteTask('uuid-123')).resolves.toBeUndefined();
+      await expect(repository.deleteTask('uuid-123')).resolves.toBeFalsy();
     });
   });
 });

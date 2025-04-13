@@ -10,6 +10,8 @@ export const validateTask = [
     .optional()
     .isIn(Object.values(TaskStatus))
     .withMessage('Invalid status'),
+  body('fileNames').optional().isArray().withMessage('fileNames must be an array'),
+  body('fileNames.*').isString().withMessage('Each file name must be a string'),
 ];
 
 export const validateTaskId = [

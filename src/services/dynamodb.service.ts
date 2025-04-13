@@ -13,17 +13,8 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { config } from '../config';
 import { logger } from '../utils/logger.util';
-  
-/**
- * Custom error for DynamoDB-related issues.
- */
-class DynamoDBError extends Error {
-  constructor(message: string, public readonly code?: string) {
-    super(message);
-    this.name = 'DynamoDBError';
-  }
-}
-  
+import { DynamoDBError } from '../utils/errors.util';
+
 /**
  * Generic service for DynamoDB operations.
  */

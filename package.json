@@ -16,7 +16,9 @@
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.788.0",
+    "@aws-sdk/client-s3": "^3.787.0",
     "@aws-sdk/lib-dynamodb": "^3.788.0",
+    "@aws-sdk/s3-request-presigner": "^3.787.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
@@ -39,6 +41,8 @@
     "@types/winston": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "^7.16.1",
     "@typescript-eslint/parser": "^7.16.1",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-jest": "^4.1.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
     "eslint-import-resolver-typescript": "^3.6.3",

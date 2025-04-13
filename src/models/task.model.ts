@@ -15,6 +15,7 @@ export interface Task {
   title: string;
   description: string;
   status: TaskStatus;
+  fileUrls?: string[]; // Array of S3 file URLs (optional)
   createdAt: string;
   updatedAt: string;
 }

@@ -30,7 +30,7 @@ describe('Tasks Controller', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    mockTasksService.prototype.createTask.mockResolvedValue(task);
+    mockTasksService.prototype.createTask.mockResolvedValue({ task });
 
     const response = await request(app)
       .post('/tasks')
@@ -132,7 +132,7 @@ describe('Tasks Controller', () => {
       createdAt: '2023-10-01T00:00:00Z',
       updatedAt: '2023-10-01T00:00:00Z',
     };
-    mockTasksService.prototype.updateTask.mockResolvedValue(task);
+    mockTasksService.prototype.updateTask.mockResolvedValue({ task });
 
     const response = await request(app)
       .put('/tasks/69d623ab-f1ef-4b1f-bd90-d741e4f45c48')

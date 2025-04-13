@@ -19,7 +19,7 @@
       "/tasks": {
         "post": {
           "summary": "Create a new task",
-          "description": "Creates a new task with the provided details and stores it in DynamoDB.",
+          "description": "Creates a new task with optional file uploads.",
           "tags": ["Tasks"],
           "requestBody": {
             "required": true,
@@ -37,7 +37,7 @@
               "content": {
                 "application/json": {
                   "schema": {
-                    "$ref": "#/components/schemas/Task"
+                    "$ref": "#/components/schemas/UpdatedTask"
                   }
                 }
               }
@@ -74,9 +74,14 @@
               "content": {
                 "application/json": {
                   "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Task"
+                    "type": "object",
+                    "properties": {
+                      "tasks": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/Task"
+                        }
+                      }
                     }
                   }
                 }
@@ -157,7 +162,7 @@
         },
         "put": {
           "summary": "Update a task",
-          "description": "Updates an existing task by its UUID in DynamoDB.",
+          "description": "Updates an existing task by its UUID with optional file uploads.",
           "tags": ["Tasks"],
           "parameters": [
             {
@@ -187,7 +192,7 @@
               "content": {
                 "application/json": {
                   "schema": {
-                    "$ref": "#/components/schemas/Task"
+                    "$ref": "#/components/schemas/UpdatedTask"
                   }
                 }
               }
@@ -226,7 +231,7 @@
         },
         "delete": {
           "summary": "Delete a task",
-          "description": "Deletes a task by its UUID from DynamoDB.",
+          "description": "Deletes a task and its associated S3 files by its UUID.",
           "tags": ["Tasks"],
           "parameters": [
             {
@@ -276,6 +281,8 @@
             }
           }
         }
+      },
+      "/tasks/{id}/upload": {
       }
     },
     "components": {
@@ -302,6 +309,12 @@
               "enum": ["pending", "in-progress", "completed"],
               "description": "Current status of the task"
             },
+            "fileUrls": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "createdAt": {
               "type": "string",
               "format": "date-time",
@@ -318,6 +331,63 @@
             "title": "Complete project proposal",
             "description": "Draft and finalize the project proposal for client review.",
             "status": "pending",
+            "fileUrls": ["https://s3-bucket/task-uuid/filename"],
+            "createdAt": "2025-04-12T10:00:00Z",
+            "updatedAt": "2025-04-12T10:00:00Z"
+          }
+        },
+        "UpdatedTask": {
+          "type": "object",
+          "required": ["id", "title", "description", "status", "createdAt", "updatedAt"],
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "Unique identifier for the task"
+            },
+            "title": {
+              "type": "string",
+              "description": "Title of the task"
+            },
+            "description": {
+              "type": "string",
+              "description": "Detailed description of the task"
+            },
+            "status": {
+              "type": "string",
+              "enum": ["pending", "in-progress", "completed"],
+              "description": "Current status of the task"
+            },
+            "fileUrls": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp when the task was created"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp when the task was last updated"
+            },
+            "uploadUrls": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "example": {
+            "id": "123e4567-e89b-12d3-a456-426614174000",
+            "title": "Complete project proposal",
+            "description": "Draft and finalize the project proposal for client review.",
+            "status": "pending",
+            "fileUrls": ["https://s3-bucket/task-uuid/filename"],
+            "uploadUrls": ["pre-signed-s3-url-to-upload-file"],
             "createdAt": "2025-04-12T10:00:00Z",
             "updatedAt": "2025-04-12T10:00:00Z"
           }
@@ -338,12 +408,21 @@
               "type": "string",
               "enum": ["pending", "in-progress", "completed"],
               "description": "Initial status of the task (defaults to 'pending' if not provided)"
+            },
+            "fileNames": {
+              "type": "array",
+              "description": "Attachment names to be uploaded under the task",
+              "items": {
+                "type": "string",
+                "description": "file name"
+              }
             }
           },
           "example": {
             "title": "Complete project proposal",
             "description": "Draft and finalize the project proposal for client review.",
-            "status": "pending"
+            "status": "pending",
+            "fileNames": ["file1.txt", "file2.txt"]
           }
         },
         "UpdateTaskRequest": {
@@ -361,12 +440,21 @@
               "type": "string",
               "enum": ["pending", "in-progress", "completed"],
               "description": "Updated status of the task"
+            },
+            "fileNames": {
+              "type": "array",
+              "description": "Attachment names to be uploaded under the task",
+              "items": {
+                "type": "string",
+                "description": "file name"
+              }
             }
           },
           "example": {
             "title": "Revised project proposal",
             "description": "Incorporate feedback and finalize the proposal.",
-            "status": "in-progress"
+            "status": "in-progress",
+            "fileNames": ["file1.txt", "file2.txt"]
           }
         },
         "ValidationErrorResponse": {
@@ -440,14 +528,54 @@
             }
           },
           "example": {
-            "message": "Invalid request data",
-            "errors": [
-              {
-                "msg": "Title is required",
-                "param": "title",
-                "location": "body"
+            "status": 500,
+            "error": {
+              "message": "Task operation failed",
+              "type": "InternalServerError",
+              "code": 10500
+            }
+          }
+        }
+      },
+      "responses": {
+        "BadRequest": {
+          "description": "Invalid request data",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ValidationErrorResponse" }
+            }
+          }
+        },
+        "NotFound": {
+          "description": "Task not found",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GenericErrorResponse" },
+              "example": {
+                "status": 404,
+                "error": {
+                  "message": "Task not found",
+                  "type": "NotFoundError",
+                  "code": 10404
+                }
               }
-            ]
+            }
+          }
+        },
+        "ServerError": {
+          "description": "Internal server error",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GenericErrorResponse" },
+              "example": {
+                "status": 500,
+                "error": {
+                  "message": "Task operation failed",
+                  "type": "InternalServerError",
+                  "code": 10500
+                }
+              }
+            }
           }
         }
       }

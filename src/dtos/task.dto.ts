@@ -4,6 +4,7 @@ export interface CreateTaskDTO {
   title: string;
   description: string;
   status: TaskStatus;
+  uploadUrls?: string[];
 }
 
-export interface UpdateTaskDTO extends CreateTaskDTO {}
+export interface UpdateTaskDTO extends Partial<CreateTaskDTO> {}
