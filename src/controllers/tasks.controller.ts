@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { TasksService } from '../services/tasks.service';
+import { TasksService } from '../services/tasks';
 import { CreateTaskDTO, UpdateTaskDTO } from '../dtos/task.dto';
 
 /**

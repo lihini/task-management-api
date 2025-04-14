@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Task, TaskStatus } from '../models/task.model';
-import { formatDate } from '../utils/date.util';
-import { NotFoundError } from '../utils/errors.util';
-import { TasksRepository } from '../repositories/tasks.repository';
-import { S3Service } from './s3.service';
-import { logger } from '../utils/logger.util';
+import { Task, TaskStatus } from '../../models/task.model';
+import { formatDate } from '../../utils/date.util';
+import { NotFoundError } from '../../utils/errors.util';
+import { TasksRepository } from '../../repositories/tasks.repository';
+import { S3Service } from '../s3.service';
+import { logger } from '../../utils/logger.util';
 
 /**
  * Service for Task specific business logic

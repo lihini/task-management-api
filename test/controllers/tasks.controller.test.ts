@@ -1,12 +1,12 @@
 import request from 'supertest';
 import express from 'express';
 import tasksRouter from '../../src/routes/tasks.route';
-import { TasksService } from '../../src/services/tasks.service';
+import { TasksService } from '../../src/services/tasks';
 import { Task, TaskStatus } from '../../src/models/task.model';
 import { NotFoundError } from '../../src/utils/errors.util';
 import { errorHandler } from '../../src/middlewares/error.middleware';
 
-jest.mock('../../src/services/tasks.service');
+jest.mock('../../src/services/tasks');
 
 const app = express();
 app.use(express.json());

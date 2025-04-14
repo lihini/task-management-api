@@ -1,15 +1,15 @@
-import { TasksService } from '../../src/services/tasks.service';
-import { TasksRepository } from '../../src/repositories/tasks.repository';
-import { Task, TaskStatus } from '../../src/models/task.model';
-import { NotFoundError } from '../../src/utils/errors.util'; // Adjust path if needed
+import { TasksService } from '../../../src/services/tasks';
+import { TasksRepository } from '../../../src/repositories/tasks.repository';
+import { Task, TaskStatus } from '../../../src/models/task.model';
+import { NotFoundError } from '../../../src/utils/errors.util'; // Adjust path if needed
 import { v4 as uuidv4 } from 'uuid';
-import { formatDate } from '../../src/utils/date.util';
-import { S3Service } from '../../src/services/s3.service';
+import { formatDate } from '../../../src/utils/date.util';
+import { S3Service } from '../../../src/services/s3.service';
 
 // Mock the TasksRepository
-jest.mock('../../src/repositories/tasks.repository');
-jest.mock('../../src/services/s3.service');
-jest.mock('../../src/config', () => ({
+jest.mock('../../../src/repositories/tasks.repository');
+jest.mock('../../../src/services/s3.service');
+jest.mock('../../../src/config', () => ({
   config: {
     aws: {
       tables: { tasks: 'test-tasks' },
@@ -22,7 +22,7 @@ const mockS3Service = S3Service as jest.MockedClass<typeof S3Service>;
 
 // Mock uuid and formatDate to control outputs
 jest.mock('uuid');
-jest.mock('../../src/utils/date.util');
+jest.mock('../../../src/utils/date.util');
 
 describe('TasksService', () => {
   let service: TasksService;
