@@ -1,6 +1,6 @@
 # Task Management API
-![test](https://github.com/github/docs/actions/workflows/node.js.yml/badge.svg)
-![deploy](https://github.com/github/docs/actions/workflows/deploy.yml/badge.svg)
+![test](https://github.com/lihini/task-management-api/actions/workflows/node.js.yml/badge.svg)
+![deploy](https://github.com/lihini/task-management-api/actions/workflows/deploy.yml/badge.svg)
 
 A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and AWS services (DynamoDB, S3, Elastic Beanstalk), with external API integration.
 
