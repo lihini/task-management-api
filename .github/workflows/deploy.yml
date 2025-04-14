@@ -16,6 +16,8 @@ jobs:
                 node-version: 22
             - name: Install dependencies
               run: npm install
+            - name: Install dependencies
+              run: npm run build
             - name: Generate deployment package
               run: zip -r nodejs-app-build.zip .
             - name: Deploy to EB
