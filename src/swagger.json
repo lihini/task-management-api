@@ -11,6 +11,10 @@
     },
     "servers": [
       {
+        "url": "http://task-mgmt-api.us-east-2.elasticbeanstalk.com",
+        "description": "Production server"
+      },
+      {
         "url": "http://localhost:3000",
         "description": "Local development server"
       }
@@ -42,26 +46,8 @@
                 }
               }
             },
-            "400": {
-              "description": "Invalid request data",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Internal server error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            }
+            "400": { "$ref": "#/components/responses/BadRequest" },
+            "500": { "$ref": "#/components/responses/ServerError" }
           }
         },
         "get": {
@@ -87,16 +73,7 @@
                 }
               }
             },
-            "500": {
-              "description": "Internal server error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            }
+            "500": { "$ref": "#/components/responses/ServerError" }
           }
         }
       },
@@ -128,36 +105,9 @@
                 }
               }
             },
-            "404": {
-              "description": "Task not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Invalid task ID",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Internal server error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            }
+            "404": { "$ref": "#/components/responses/NotFound" },
+            "400": { "$ref": "#/components/responses/BadRequest" },
+            "500": { "$ref": "#/components/responses/ServerError" }
           }
         },
         "put": {
@@ -197,36 +147,9 @@
                 }
               }
             },
-            "404": {
-              "description": "Task not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Invalid request data or task ID",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Internal server error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            }
+            "404": { "$ref": "#/components/responses/NotFound" },
+            "400": { "$ref": "#/components/responses/BadRequest" },
+            "500": { "$ref": "#/components/responses/ServerError" }
           }
         },
         "delete": {
@@ -249,36 +172,9 @@
             "204": {
               "description": "Task deleted successfully"
             },
-            "404": {
-              "description": "Task not found",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "Invalid task ID",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ValidationErrorResponse"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Internal server error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/GenericErrorResponse"
-                  }
-                }
-              }
-            }
+            "404": { "$ref": "#/components/responses/NotFound" },
+            "400": { "$ref": "#/components/responses/BadRequest" },
+            "500": { "$ref": "#/components/responses/ServerError" }
           }
         }
       },
@@ -661,6 +557,22 @@
                   "message": "Task operation failed",
                   "type": "InternalServerError",
                   "code": 10500
+                }
+              }
+            }
+          }
+        },
+        "APIError": {
+          "description": "Upstream API Error",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GenericErrorResponse" },
+              "example": {
+                "status": 502,
+                "error": {
+                  "message": "Network Error",
+                  "type": "ExternalApiError",
+                  "code": 10502
                 }
               }
             }
