@@ -1,13 +1,17 @@
 # Task Management API
+![test](https://github.com/lihini/task-management-api/actions/workflows/node.js.yml/badge.svg)
+![deploy](https://github.com/lihini/task-management-api/actions/workflows/deploy.yml/badge.svg)
 
-A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and AWS services (DynamoDB and S3).
+A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and AWS services (DynamoDB, S3, Elastic Beanstalk), with external API integration.
 
 ## Features
 - Create, read, update, and delete tasks.
-- Task fields: `id`, `title`, `description`, `status`, `createdAt`, `updatedAt`.
-- Input validation and error handling.
+- Task fields: `id`, `title`, `description`, `status`, `createdAt`, `updatedAt`, `fileUrls`.
 - Integration with AWS DynamoDB for task storage.
 - Integration with AWS S3 for file attachments.
+- Fetch user data from JSONPlaceholder with 5-minute caching in DynamoDB.
+- Deployment on AWS Elastic Beanstalk for scalability.
+- Input validation and error handling.
 - Comprehensive unit and integration tests.
 - Logging with Winston.
 
@@ -17,7 +21,6 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 - TypeScript
 - Git
 - AWS CLI (for provisioning)
-- AWS CDK (optional, for CDK-based provisioning)
 
 ## Setup
 
@@ -88,7 +91,18 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 
 5. **Configure environment variables**: 
 
-    Copy `.env.sample` to `.env` and fill in your AWS credentials and configurations.
+    Copy `.env.sample` to `.env.local` and fill in your AWS credentials and configurations.
+    ```
+    AWS_ACCESS_KEY_ID=your_access_key
+    AWS_SECRET_ACCESS_KEY=your_secret_key
+    AWS_REGION=us-east-1
+    S3_BUCKET_NAME=your-s3-bucket
+    DYNAMODB_TASKS_TABLE_NAME=tasks-table
+    DYNAMODB_CACHE_TABLE_NAME=cache-table
+    EXTERNAL_API_URL=https://jsonplaceholder.typicode.com
+    CACHE_TTL_SECONDS=300
+    PORT=3000
+    ```
 
 6. Build the project:
     ```bash
@@ -109,6 +123,12 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
     ```bash
     npm run test
     ```
+
+10. Deploy to AWS Elastic Beanstalk via GitHub Actions:
+
+    - Push to `main` branch to test and deploy the app to Elastic Beanstalk
+    - Access API at [http://task-mgmt-api.us-east-2.elasticbeanstalk.com/](http://task-mgmt-api.us-east-2.elasticbeanstalk.com/)
+    - View API documentation and try it out at [http://task-mgmt-api.us-east-2.elasticbeanstalk.com/api-docs](http://task-mgmt-api.us-east-2.elasticbeanstalk.com/api-docs)
 
 ## API Endpoints
 - POST /tasks: Create a task
@@ -135,6 +155,7 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 
 - `src/config/`: Environment variable configuration
 - `src/controllers/`: Request handling logic
+- `src/dtos/`: Request and response data types
 - `src/middlewares/`: Custom middleware for validation and error handling
 - `src/models/`: Data models
 - `src/repositories/`: Data access logic
@@ -142,14 +163,16 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 - `src/services/`: Business logic
 - `src/utils/`: Utility functions
 - `tests`: Unit and integration tests
+- `.github/workflows/`: GitHub Actions workflows for CI/CD
 
 ## AWS Setup
-- DynamoDB Tables:
+- **DynamoDB Tables:**
     - `tasks`: partition key `id` (string).
         - Provisioned Throughput: 5 read/write capacity units (adjust as needed)
     - `cache`: Partition key `key` (string), TTL on `expiresAt`.
-- S3 Bucket: `task-attachments`, with CORS enabled for uploads.
-- IAM Permissions: Ensure `s3:PutObject`, `s3:DeleteObject`, and DynamoDB CRUD permissions.
+- **S3 Bucket:** `task-attachments`, with CORS enabled for uploads.
+- **Elastic Beanstalk: **Node.js environment hosting the API, deployed via GitHub Actions.
+- **IAM Permissions:** Ensure `s3:PutObject`, `s3:DeleteObject`, `dynamodb:*`, and Elastic Beanstalk permissions.
 
 ## Key Modular Design Principles
 - Separation of Concerns
