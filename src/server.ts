@@ -1,6 +1,7 @@
 import express from 'express';
 import { config } from './config';
 import tasksRouter from './routes/tasks.route';
+import userRouter from './routes/users.route';
 import { errorHandler } from './middlewares/error.middleware';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -13,6 +14,7 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use('/tasks', tasksRouter);
+app.use('/users', userRouter);
 app.use('/api-docs', serve, setup(swaggerDocument));
 
 app.get<{}, { message: string }>('/', (req, res) => {

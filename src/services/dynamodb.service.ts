@@ -13,6 +13,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { config } from '../config';
 import { logger } from '../utils/logger.util';
+import { CachedEntry } from '../models/cached-entry.model';
 import { DynamoDBError } from '../utils/errors.util';
 
 /**
@@ -175,6 +176,64 @@ export class DynamoDBService {
         throw new DynamoDBError(`Table ${tableName} not found`, 'TableNotFound');
       }
       throw new DynamoDBError(`Failed to delete item: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Caches data with a TTL in the given cache table.
+   * @param tableName - The name of the DynamoDB table
+   * @param key - Cache key.
+   * @param data - Data to cache.
+   * @param ttlSeconds - Time-to-live in seconds.
+   */
+  async cacheData<T>(tableName: string, key: string, data: T, ttlSeconds: number): Promise<void> {
+    try {
+      const expiresAt = Math.floor(Date.now() / 1000) + ttlSeconds;
+      await this.docClient.send(
+        new PutCommand({
+          TableName: tableName,
+          Item: {
+            key,
+            data: JSON.stringify(data),
+            expiresAt,
+          },
+        }),
+      );
+      logger.info(`Cached data for key: ${key}`);
+    } catch (error) {
+      logger.error(`DynamoDB cacheData error: ${error}`);
+      throw new DynamoDBError(`Failed to cache data: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Retrieves cached data from the given cache table.
+   * @param tableName - The name of the DynamoDB table
+   * @param key - Cache key.
+   * @returns Cached data or null if not found/expired.
+   */
+  async getCachedData<T>(tableName: string, key: string): Promise<T | null> {
+    try {
+      const result = await this.docClient.send(
+        new GetCommand({
+          TableName: tableName,
+          Key: { key },
+        }),
+      );
+      if (!result.Item) {
+        return null;
+      }
+      const item = result.Item as CachedEntry;
+      const now = Math.floor(Date.now() / 1000);
+      if (item.expiresAt < now) {
+        // Delete expired item
+        await this.deleteItem(tableName, { key });
+        return null;
+      }
+      return JSON.parse(item.data) as T;
+    } catch (error) {
+      logger.error(`DynamoDB getCachedData error: ${error}`);
+      throw new DynamoDBError(`Failed to get cached data: ${(error as Error).message}`);
     }
   }
 }

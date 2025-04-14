@@ -282,7 +282,39 @@
           }
         }
       },
-      "/tasks/{id}/upload": {
+      "/users": {
+        "get": {
+          "summary": "Get users from external API",
+          "description": "Fetches user data from JSONPlaceholder with 5-minute caching.",
+          "tags": ["Users"],
+          "responses": {
+            "200": {
+              "description": "List of users",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "users": {
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/ExternalUser" }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "502": {
+              "description": "External API error",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/GenericErrorResponse" }
+                }
+              }
+            },
+            "500": { "$ref": "#/components/responses/ServerError" }
+          }
+        }
       }
     },
     "components": {
@@ -390,6 +422,62 @@
             "uploadUrls": ["pre-signed-s3-url-to-upload-file"],
             "createdAt": "2025-04-12T10:00:00Z",
             "updatedAt": "2025-04-12T10:00:00Z"
+          }
+        },
+        "ExternalUser": {
+          "type": "object",
+          "required": ["id", "name", "username", "email"],
+          "properties": {
+            "id": { "type": "integer" },
+            "name": { "type": "string" },
+            "username": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "address": {
+              "type": "object",
+              "properties": {
+                "street": { "type": "string" },
+                "suite": { "type": "string" },
+                "city": { "type": "string" },
+                "zipcode": { "type": "string" },
+                "geo": {
+                  "type": "object",
+                  "properties": {
+                    "lat": { "type": "string" },
+                    "lng": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "phone": { "type": "string" },
+            "website": { "type": "string" },
+            "company": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "catchPhrase": { "type": "string" },
+                "bs": { "type": "string" }
+              }
+            }
+          },
+          "example": {
+            "id": 1,
+            "name": "Leanne Graham",
+            "username": "Bret",
+            "email": "Sincere@april.biz",
+            "address": {
+              "street": "Kulas Light",
+              "suite": "Apt. 556",
+              "city": "Gwenborough",
+              "zipcode": "92998-3874",
+              "geo": { "lat": "-37.3159", "lng": "81.1496" }
+            },
+            "phone": "1-770-736-8031 x56442",
+            "website": "hildegard.org",
+            "company": {
+              "name": "Romaguera-Crona",
+              "catchPhrase": "Multi-layered client-server neural-net",
+              "bs": "harness real-time e-markets"
+            }
           }
         },
         "CreateTaskRequest": {
@@ -581,9 +669,7 @@
       }
     },
     "tags": [
-      {
-        "name": "Tasks",
-        "description": "Operations related to task management"
-      }
+      { "name": "Tasks", "description": "Operations related to task management" },
+      { "name": "Users", "description": "Operations related to external user data" }
     ]
   }

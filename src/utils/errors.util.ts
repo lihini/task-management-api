@@ -26,3 +26,12 @@ export class S3Error extends Error {
   }
 }
 
+/**
+ * Custom error for external API issues.
+ */
+export class ExternalApiError extends Error {
+  constructor(message: string, public readonly code?: string) {
+    super(message);
+    this.name = 'ExternalApiError';
+  }
+}

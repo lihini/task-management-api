@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { DynamoDBError, NotFoundError, S3Error } from '../utils/errors.util';
+import { DynamoDBError, ExternalApiError, NotFoundError, S3Error } from '../utils/errors.util';
 import { GenericErrorResponse } from '../dtos/error-response.dto';
 import { logger } from '../utils/logger.util';
 
@@ -39,6 +39,13 @@ export const errorHandler = (
     return;
   }
 
+  if (err instanceof ExternalApiError) {
+    // return 502 to indicate upstream issues
+    res.status(502).json({
+      message: `External API error: ${err.message}`,
+    });
+    return;
+  }
 
   // return all other errors with 500 status code
   res.status(500).json(<GenericErrorResponse>{

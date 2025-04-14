@@ -14,7 +14,12 @@ export const config = {
     s3Bucket: process.env.S3_BUCKET_NAME || 'task-mgmt-api-attachments',
     tables: {
       tasks: process.env.DYNAMODB_TASKS_TABLE_NAME,
+      cache: process.env.DYNAMODB_CACHE_TABLE_NAME || 'cache',
     },
+  },
+  userApi: {
+    baseUrl: process.env.EXTERNAL_API_URL || 'https://jsonplaceholder.typicode.com',
+    cacheTtlSeconds: parseInt(process.env.CACHE_TTL_SECONDS || '300', 10), // 5 minutes
   },
   port: process.env.PORT || 3000,
 };
