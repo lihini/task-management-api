@@ -116,6 +116,8 @@ A scalable RESTful API for managing tasks, built with Node.js, TypeScript, and A
 - GET /tasks/:id: Get a task by ID
 - PUT /tasks/:id: Update a task
 - DELETE /tasks/:id: Delete a task
+- GET /users: Get users from external service
+- GET /api-docs: API documentation with Swagger
 
 ## File Upload Workflow
 1. Send fileNames in POST /tasks or PUT /tasks/:id.
